@@ -18,7 +18,7 @@ class SubCategory(models.Model):
 class Product(TimeStampModel): 
     sub_category = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
     name         = models.CharField(max_length=50)
-    group        = models.CharField(max_length=50)
+    description  = models.CharField(max_length=50)
     price        = models.DecimalField(max_digits=10, decimal_places=0)
     thumbnail    = models.URLField(max_length=300)
 
