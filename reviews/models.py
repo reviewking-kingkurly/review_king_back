@@ -5,7 +5,6 @@ from core.models import TimeStampModel
 class Review(TimeStampModel): 
     user    = models.ForeignKey('users.User', on_delete=models.CASCADE)
     product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
-    title   = models.CharField(max_length=100)
     content = models.TextField()
 
     class Meta: 
