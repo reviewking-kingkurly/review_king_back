@@ -6,6 +6,7 @@ class User(TimeStampModel):
     name     = models.CharField(max_length=45)
     email    = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=150)
+    grade    = models.IntegerField(deafult=6)
 
     class Meta: 
         db_table = "users"
