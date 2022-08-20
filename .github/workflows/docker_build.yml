@@ -3,9 +3,9 @@ name: Docker Build
 on:
   push:
     branches:
-      - "**"
+      - "main"
     tags:
-      - "**"
+      - "main"
 
 jobs:
   build:
