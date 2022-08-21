@@ -55,3 +55,25 @@ class ReviewView(View):
         
         except Product.DoesNotExist:
             return JsonResponse({'Message': 'PRODUCT_DOES_NOT_EXIST'}, status=404)
+        
+class ReviewDetailView(View):
+    def get(self, request, review_id):
+        try:
+            review = Review.objects.get(id=review_id)
+            
+            results = {
+                'id': review.id,
+                'user_name': review.user.name,
+                'user_grade': review.user.grade,
+                'content': review.content,
+                'created_at': review.created_at,
+                'product_id': review.product.id,
+                'product_name': review.product.name,
+                'product_description': review.product.description,
+                'review_like': review.like_set.all().count()
+            }
+            
+            return JsonResponse({'results': results}, status=200)
+        
+        except Review.DoesNotExist:
+            return JsonResponse({'Message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
