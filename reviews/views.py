@@ -49,7 +49,7 @@ class ReviewView(View):
                     
                 for product_id in product_id_purchased_with :
                     ProductPurchasedWith.objects.create(
-                        review  = review,
+                        review     = review,
                         product_id = product_id
                     )
                     
@@ -59,7 +59,7 @@ class ReviewView(View):
                         subcategory = SubCategory.objects.get(name=subcategory)
                         if subcategory.id != review.product.sub_category.id:
                             KeywordFromReview.objects.create(
-                                review  = review,
+                                review       = review,
                                 sub_category = subcategory
                             )
                         
@@ -87,25 +87,25 @@ class ReviewView(View):
                 return JsonResponse({'message' : 'INVALID_USER'}, status=400)
             
             results = {
-                'product_id': order_item.product.id,
-                'product_name': order_item.product.name,
-                'product_price': order_item.product.price,
-                'product_quantity': order_item.quantity,
-                'product_thumbnail': order_item.product.thumbnail,
-                'delivery_date': [delivery.delievery_date for delivery in order_item.delivery_set.all()],
-                'order_status': order_item.order.order_status.status,
+                'product_id'            : order_item.product.id,
+                'product_name'          : order_item.product.name,
+                'product_price'         : order_item.product.price,
+                'product_quantity'      : order_item.quantity,
+                'product_thumbnail'     : order_item.product.thumbnail,
+                'delivery_date'         : [delivery.delievery_date for delivery in order_item.delivery_set.all()],
+                'order_status'          : order_item.order.order_status.status,
                 'product_purchased_with':[{
-                    'product_id': product_with.product.id,
-                    'product_name': product_with.product.name,
+                    'product_id'       : product_with.product.id,
+                    'product_name'     : product_with.product.name,
                     'product_thumbnail': product_with.product.thumbnail,
-                    'product_price': product_with.product.price
+                    'product_price'    : product_with.product.price
                 } for product_with in order_item.order.ordereditem_set.all()]
             }
             
             return JsonResponse({'results': results}, status=200)
         
-        except Review.DoesNotExist:
-            return JsonResponse({'message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
+        except OrderedItem.DoesNotExist:
+            return JsonResponse({'message': 'ORDER_ITEM_DOES_NOT_EXIST'}, status=404)
         
 class ReviewDetailView(View):
     def get(self, request, review_id):
@@ -114,18 +114,20 @@ class ReviewDetailView(View):
             
             results = {
                 'id': review.id,
-                'user_name': review.user.name,
-                'user_grade': review.user.grade,
-                'content': review.content,
-                'created_at': review.created_at,
-                'product_id': review.product.id,
-                'product_name': review.product.name,
-                'product_description': review.product.description,
-                'review_like': review.like_set.all().count(),
+                'user_name'             : review.user.name,
+                'user_grade'            : review.user.grade,
+                'content'               : review.content,
+                'created_at'            : review.created_at,
+                'review_image'          : [review_image.img_url for review_image in review.reviewimage_set.all()],
+                'product_id'            : review.product.id,
+                'product_name'          : review.product.name,
+                'product_description'   : review.product.description,
+                'review_like'           : review.like_set.all().count(),
                 'product_purchased_with':[{
-                    'product_id': product_with.product.id,
-                    'product_name': product_with.product.name,
-                    'product_price': product_with.product.price
+                    'product_id'       : product_with.product.id,
+                    'product_name'     : product_with.product.name,
+                    'product_price'    : product_with.product.price,
+                    'product_thumbnail': product_with.product.thumbnail
             } for product_with in review.productpurchasedwith_set.all()]
             }
             
