@@ -88,7 +88,7 @@ class ReviewDetailView(View):
                 'product_name': review.product.name,
                 'product_description': review.product.description,
                 'review_like': review.like_set.all().count(),
-                'ProductPurchasedWith':[{
+                'product_purchased_with':[{
                     'product_id': product_with.product.id,
                     'product_name': product_with.product.name,
                     'product_price': product_with.product.price
