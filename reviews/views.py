@@ -6,7 +6,7 @@ from django.views import View
 from django.db    import transaction
 
 from reviews.models       import Review, ReviewImage, ProductPurchasedWith, KeywordFromReview
-from products.models      import Product, SubCategory, OrderedItem
+from products.models      import Product, SubCategory, OrderedItem, Order
 from core.utils           import login_decorator
 from core.review_keyword  import review_keyword
 from review_king.settings import (
@@ -135,3 +135,23 @@ class ReviewDetailView(View):
         
         except Review.DoesNotExist:
             return JsonResponse({'message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
+
+class WriteReviewListView(View):
+    @login_decorator
+    def get(self, request):
+        user   = request.user
+        orders = Order.objects.filter(user=user)
+        
+        results = [{
+            'order_number' : order.order_num,
+            'order_status' : order.order_status.status,
+            'ordered_at'   : order.ordered_at,
+            'product'      :[{
+                'product_id'       : order_item.product.id,
+                'product_name'     : order_item.product.name,
+                'product_thumbnail': order_item.product.thumbnail,
+                'review_id'        : [review.id for review in order_item.product.review_set.filter(user=user)]
+            } for order_item in order.ordereditem_set.all()]
+        } for order in orders]
+        
+        return JsonResponse({'results': results}, status=200)
