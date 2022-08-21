@@ -56,10 +56,11 @@ class ReviewView(View):
                 for subcategory in review_keyword_subcategories:
                     if SubCategory.objects.get(name=subcategory):
                         subcategory = SubCategory.objects.get(name=subcategory)
-                        KeywordFromReview.objects.create(
-                            review  = review,
-                            sub_category = subcategory
-                        )
+                        if subcategory.id != review.product.sub_category.id:
+                            KeywordFromReview.objects.create(
+                                review  = review,
+                                sub_category = subcategory
+                            )
                         
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         
