@@ -61,16 +61,16 @@ class ReviewView(View):
                             sub_category = subcategory
                         )
                         
-            return JsonResponse({'Message': 'SUCCESS'}, status=200)
+            return JsonResponse({'message': 'SUCCESS'}, status=200)
         
         except KeyError:
-            return JsonResponse({'Message': 'KEY_ERROR'}, status=400)
+            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
         
         except transaction.TransactionManagementError:
-            return JsonResponse({'message': 'TransactionManagementError'}, status=400)
+            return JsonResponse({'message': 'TRANSACTION_MANAGEMENT_ERROR'}, status=400)
         
         except Product.DoesNotExist:
-            return JsonResponse({'Message': 'PRODUCT_DOES_NOT_EXIST'}, status=404)
+            return JsonResponse({'message': 'PRODUCT_DOES_NOT_EXIST'}, status=404)
         
 class ReviewDetailView(View):
     def get(self, request, review_id):
@@ -86,10 +86,15 @@ class ReviewDetailView(View):
                 'product_id': review.product.id,
                 'product_name': review.product.name,
                 'product_description': review.product.description,
-                'review_like': review.like_set.all().count()
+                'review_like': review.like_set.all().count(),
+                'ProductPurchasedWith':[{
+                    'product_id': product_with.product.id,
+                    'product_name': product_with.product.name,
+                    'product_price': product_with.product.price
+            } for product_with in review.productpurchasedwith_set.all()]
             }
             
             return JsonResponse({'results': results}, status=200)
         
         except Review.DoesNotExist:
-            return JsonResponse({'Message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
+            return JsonResponse({'message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
