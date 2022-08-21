@@ -1,3 +1,4 @@
+import json
 import boto3, uuid
 
 from django.http  import JsonResponse
@@ -5,7 +6,7 @@ from django.views import View
 from django.db    import transaction
 
 from reviews.models       import Review, ReviewImage, ProductPurchasedWith, KeywordFromReview
-from products.models      import Product, SubCategory
+from products.models      import Product, SubCategory, OrderedItem
 from core.utils           import login_decorator
 from core.review_keyword  import review_keyword
 from review_king.settings import (
@@ -72,6 +73,39 @@ class ReviewView(View):
         
         except Product.DoesNotExist:
             return JsonResponse({'message': 'PRODUCT_DOES_NOT_EXIST'}, status=404)
+        
+    @login_decorator
+    def get(self, request):
+        try:
+            data            = json.loads(request.body)
+            user            = request.user
+            ordered_item_id = data['ordered_item_id']
+            
+            order_item = OrderedItem.objects.get(id=ordered_item_id)
+            
+            if order_item.order.user_id != user.id:
+                return JsonResponse({'message' : 'INVALID_USER'}, status=400)
+            
+            results = {
+                'product_id': order_item.product.id,
+                'product_name': order_item.product.name,
+                'product_price': order_item.product.price,
+                'product_quantity': order_item.quantity,
+                'product_thumbnail': order_item.product.thumbnail,
+                'delivery_date': [delivery.delievery_date for delivery in order_item.delivery_set.all()],
+                'order_status': order_item.order.order_status.status,
+                'product_purchased_with':[{
+                    'product_id': product_with.product.id,
+                    'product_name': product_with.product.name,
+                    'product_thumbnail': product_with.product.thumbnail,
+                    'product_price': product_with.product.price
+                } for product_with in order_item.order.ordereditem_set.all()]
+            }
+            
+            return JsonResponse({'results': results}, status=200)
+        
+        except Review.DoesNotExist:
+            return JsonResponse({'message': 'REVIEW_DOES_NOT_EXIST'}, status=404)
         
 class ReviewDetailView(View):
     def get(self, request, review_id):
