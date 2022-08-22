@@ -8,7 +8,7 @@ from django.db.models import Count
 from datetime         import date, timedelta
 from operator         import itemgetter
 
-from reviews.models       import Review, ReviewImage, ProductPurchasedWith, KeywordFromReview
+from reviews.models       import Review, ReviewImage, ProductPurchasedWith, KeywordFromReview, Like
 from products.models      import Product, SubCategory, OrderedItem, Order
 from core.utils           import login_decorator
 from core.review_keyword  import review_keyword
@@ -199,3 +199,25 @@ class ReviewRankingCategoryView(View):
         results = sorted(category_list, key=itemgetter('review_count'), reverse=True)[:5]
         
         return JsonResponse({'results': results}, status=200)
+
+class ReviewLikeView(View):
+    @login_decorator
+    def post(self, request):
+        try:
+            data      = json.loads(request.body)
+            review_id = data['review_id']
+            
+            review = Review.objects.get(id=review_id)
+            like, flag = Like.objects.get_or_create(review=review,user=request.user)
+            
+            if not flag:
+                like.delete()
+                message = 'NO_CONTENT'
+                
+            else:
+                message = 'SUCCESS'
+                
+            return JsonResponse({'message': message}, status=200)
+            
+        except KeyError:
+            return JsonResponse({'Message': 'KEY_ERROR'}, status=400)
