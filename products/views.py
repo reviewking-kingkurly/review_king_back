@@ -17,7 +17,7 @@ class ProductDetailView(View):
                 'product_price'       : product.price,
                 'product_thumbnail'   : product.thumbnail,
             }
-            return JsonResponse({"result" : product_detail}, status=200)
+            return JsonResponse({"results" : product_detail}, status=200)
 
         except Product.DoesNotExist:
             return JsonResponse({"message" : "PRODUCT_DOES_NOT_EXIST"}, status=404)
@@ -31,7 +31,7 @@ class RelatedCategoryView(View):
         for sub_category_id in related_products_list:
             sub_category_count = related_products.filter(sub_category_id = sub_category_id).count()
             count_list.append(sub_category_count)
-        total_count = sum(count_list)
+        total_count = sum(sorted(count_list, reverse=True)[:5])
 
         related_categories_list = []
         for sub_category_id in related_products_list:
@@ -42,9 +42,9 @@ class RelatedCategoryView(View):
                 'sub_category_share': round(related_products.filter(sub_category_id = sub_category_id).count()/total_count*100)
             }
             related_categories_list.append(related_categories)
-        result = sorted(related_categories_list, key=lambda x:x['sub_category_count'], reverse=True)[:5]
+        related_categories_list = sorted(related_categories_list, key=lambda x:x['sub_category_count'], reverse=True)[:5]
         
-        return JsonResponse({"total_count" : total_count, "result" : result}, status=200)
+        return JsonResponse({"total_count" : total_count, "results" : related_categories_list}, status=200)
 
 class RelatedProductView(View):
     def get(self, request, product_id):
@@ -60,7 +60,7 @@ class RelatedProductView(View):
                     'product_name' : product.name,
                     'product_price': product.price,
                 } for product in products]
-                return JsonResponse({"result" : related_product_list}, status=200)
+                return JsonResponse({"results" : related_product_list}, status=200)
             
             else:
                 return JsonResponse({"message" : "INVALID_SUB_CATEGORY"}, status=400)
@@ -81,7 +81,7 @@ class PurchasedProductView(View):
             'product_thumbnail': purchased_product.product.thumbnail,
         } for purchased_product in purchased_products]
         
-        return JsonResponse({"result" : purhcased_products_list}, status=200)
+        return JsonResponse({"results" : purhcased_products_list}, status=200)
 
 class SearchView(View):
     def get(self, request):
