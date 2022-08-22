@@ -111,6 +111,7 @@ class ReviewView(View):
             return JsonResponse({'message': 'ORDER_ITEM_DOES_NOT_EXIST'}, status=404)
         
 class ReviewDetailView(View):
+    @login_decorator
     def get(self, request, review_id):
         try:
             review = Review.objects.get(id=review_id)
@@ -219,5 +220,30 @@ class ReviewLikeView(View):
                 
             return JsonResponse({'message': message}, status=200)
             
+        except KeyError:
+            return JsonResponse({'Message': 'KEY_ERROR'}, status=400)
+
+class ReviewListView(View):
+    def get(self, request):
+        try:
+            data       = json.loads(request.body)
+            product_id = data['product_id']
+            
+            reviews = Review.objects.filter(product_id=product_id)
+            
+            review_list = [{
+                'id': review.id,
+                'user_name'             : review.user.name,
+                'user_grade'            : review.user.grade,
+                'content'               : review.content,
+                'created_at'            : review.created_at,
+                'review_image'          : [review_image.img_url for review_image in review.reviewimage_set.all()],
+                'review_like'           : review.like_set.all().count(),
+            }for review in reviews]
+            
+            results = sorted(review_list, key=itemgetter('review_like'), reverse=True)
+            
+            return JsonResponse({'results': results}, status=200)
+        
         except KeyError:
             return JsonResponse({'Message': 'KEY_ERROR'}, status=400)
