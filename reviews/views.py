@@ -1,9 +1,12 @@
 import json
 import boto3, uuid
 
-from django.http  import JsonResponse
-from django.views import View
-from django.db    import transaction
+from django.http      import JsonResponse
+from django.views     import View
+from django.db        import transaction
+from django.db.models import Count
+from datetime         import date, timedelta
+from operator         import itemgetter
 
 from reviews.models       import Review, ReviewImage, ProductPurchasedWith, KeywordFromReview
 from products.models      import Product, SubCategory, OrderedItem, Order
@@ -153,5 +156,46 @@ class WriteReviewListView(View):
                 'review_id'        : [review.id for review in order_item.product.review_set.filter(user=user)]
             } for order_item in order.ordereditem_set.all()]
         } for order in orders]
+        
+        return JsonResponse({'results': results}, status=200)
+
+class BestReviewListView(View):
+    def get(self, request):
+        reviews = Review.objects.filter(created_at__range=[
+            date.today() - timedelta(days=30), date.today() + timedelta(days=1)
+            ]).annotate(review_like=Count('like')).order_by('-like')[:10]
+        
+        results = [{
+            'review_id'         : review.id,
+            'review_content'    : review.content,
+            'product_id'        : review.product.id,
+            'product_name'      : review.product.name,
+            'product_thumbnail' : review.product.thumbnail,
+        } for review in reviews]
+        
+        return JsonResponse({'results': results}, status=200)
+
+class ReviewRankingCategoryView(View):
+    def get(self, request):
+        sub_categories = SubCategory.objects.all()
+        sub_category_names = [sub_category.name for sub_category in sub_categories]
+        
+        category_list = []
+        
+        for sub_category_name in sub_category_names:
+            review = Review.objects.filter(product_id__sub_category__name=sub_category_name)
+            sub_category = sub_categories.get(name=sub_category_name)
+            category_list.append({
+                'sub_category'      : sub_category.id,
+                'sub_category_name' : sub_category.name,
+                'review_count'      : review.count(),
+                'product'           : [{
+                    'product_id'        : product.id,
+                    'product_name'      : product.name,
+                    'product_thumbnail' : product.thumbnail,
+                }for product in sub_category.product_set.all()]
+            })
+        
+        results = sorted(category_list, key=itemgetter('review_count'), reverse=True)[:5]
         
         return JsonResponse({'results': results}, status=200)
