@@ -8,7 +8,7 @@ pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
+env=environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, 'SECRET_KEY'),
     BASE_URL=(str, 'localhost:8000'),
@@ -24,13 +24,13 @@ environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
 
-ALGORITHM = env('ALGORITHM')
+ALGORITHM=env('ALGORITHM')
 
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY=env('SECRET_KEY')
 
-DEBUG = env('DEBUG')
+DEBUG=env('DEBUG')
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS=env('ALLOWED_HOSTS')
 
 DATABASES = {
     'default': {
@@ -43,11 +43,11 @@ DATABASES = {
     }
 }
 
-AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-AWS_REGION = env('AWS_REGION')
-AWS_IMAGE_URL = env('AWS_IMAGE_URL')
+AWS_ACCESS_KEY_ID=env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY=env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME=env('AWS_STORAGE_BUCKET_NAME')
+AWS_REGION=env('AWS_REGION')
+AWS_IMAGE_URL=env('AWS_IMAGE_URL')
 
 INSTALLED_APPS = [
     # 'django.contrib.admin',
