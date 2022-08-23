@@ -2,7 +2,7 @@ FROM python:3.9
 
 RUN pip install django
 
-WORKDIR /usr/src/app
+WORKDIR /tmp
 
 RUN pip install --upgrade pip
 
@@ -14,6 +14,8 @@ COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT [ "bash", "-l", "/user/src/app/api_entrypoint.sh" ]
+RUN chmod +x /tmp/api_entrypoint.sh
+
+ENTRYPOINT [ "bash", "-l", "/tmp/api_entrypoint.sh" ]
 
 # CMD ["gunicorn", "--bind", "0.0.0.0:8000", "review_king.wsgi:application"]
