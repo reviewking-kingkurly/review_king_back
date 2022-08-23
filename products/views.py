@@ -1,5 +1,6 @@
 from django.http  import JsonResponse
 from django.views import View
+from django.db.models import Count
 
 from products.models import Product, SubCategory
 from reviews.models  import Review
@@ -94,7 +95,7 @@ class SearchView(View):
             'product_thumbnail': product.thumbnail
         } for product in products]
 
-        reviews = Review.objects.select_related('product').all()
+        reviews = Review.objects.select_related('product').all().annotate(review_like=Count('like')).order_by('-review_like')
         review_list = [{
             'review_id'     : review.id,
             'product_id'    : review.product.id,
