@@ -59,6 +59,7 @@ class RelatedProductView(View):
                     'product_id'   : product.id,
                     'product_name' : product.name,
                     'product_price': product.price,
+                    'product_thumbnail' : product.thumbnail,
                 } for product in products]
                 return JsonResponse({"results" : related_product_list}, status=200)
             
