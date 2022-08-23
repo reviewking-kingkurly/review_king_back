@@ -83,7 +83,7 @@ class WriteReviewView(View):
         try:
             user = request.user
             
-            order_item = OrderedItem.objects.get(id=ordered_item_id)
+            order_item = OrderedItem.objects.select_related('order', 'product').get(id=ordered_item_id)
             
             if order_item.order.user_id != user.id:
                 return JsonResponse({'message' : 'INVALID_USER'}, status=400)
@@ -103,7 +103,7 @@ class WriteReviewView(View):
                     'product_name'     : product_with.product.name,
                     'product_thumbnail': product_with.product.thumbnail,
                     'product_price'    : product_with.product.price
-                } for product_with in order_item.order.ordereditem_set.all()]
+                } for product_with in order_item.order.ordereditem_set.all().exclude(id=ordered_item_id)]
             }
             
             return JsonResponse({'message': 'SUCCESS', 'results': results}, status=200)
@@ -167,7 +167,7 @@ class BestReviewListView(View):
     def get(self, request):
         reviews = Review.objects.filter(created_at__range=[
             date.today() - timedelta(days=30), date.today() + timedelta(days=1)
-            ]).annotate(review_like=Count('like')).order_by('-like')[:10]
+            ]).annotate(review_like=Count('like')).order_by('-review_like')[:10]
         
         results = [{
             'review_id'         : review.id,
@@ -175,6 +175,7 @@ class BestReviewListView(View):
             'product_id'        : review.product.id,
             'product_name'      : review.product.name,
             'product_thumbnail' : review.product.thumbnail,
+            'review_like'       : review.like_set.all().count(),
             'product_price' : review.product.price,
         } for review in reviews]
         

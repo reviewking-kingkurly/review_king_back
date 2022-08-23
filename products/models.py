@@ -56,5 +56,8 @@ class OrderedItem(models.Model):
         db_table = "ordered_items"
 
 class Delivery(models.Model): 
-    ordered_item   = models.ForeignKey('OrderedItem', on_delete=models.CASCADE)
-    delievery_date = models.DateField()
+    ordered_item  = models.ForeignKey('OrderedItem', on_delete=models.CASCADE)
+    delivery_date = models.DateField()
+
+    class Meta:
+        db_table = "deliveries"
