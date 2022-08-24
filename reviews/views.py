@@ -115,7 +115,7 @@ class ReviewDetailView(View):
     @login_decorator
     def get(self, request, review_id):
         try:
-            review = Review.objects.get(id=review_id)
+            review = Review.objects.select_related('user', 'product').get(id=review_id)
             
             results = {
                 'id': review.id,
@@ -148,15 +148,17 @@ class WriteReviewListView(View):
         user   = request.user
         orders = Order.objects.filter(user=user,ordered_at__range=[
             date.today() - timedelta(days=30), date.today() + timedelta(days=1)
-            ])
+            ]).order_by('-ordered_at')
         results = [{
             'order_number' : order.order_num,
             'order_status' : order.order_status.status,
             'ordered_at'   : order.ordered_at,
             'product'      :[{
+                'order_item_id'    : order_item.id,
                 'product_id'       : order_item.product.id,
                 'product_name'     : order_item.product.name,
                 'product_thumbnail': order_item.product.thumbnail,
+                'delivery_date'    : [delivery.delivery_date for delivery in order_item.delivery_set.all()],
                 'review_id'        : [review.id for review in order_item.product.review_set.filter(user=user)]
             } for order_item in order.ordereditem_set.all()]
         } for order in orders]
@@ -165,7 +167,7 @@ class WriteReviewListView(View):
 
 class BestReviewListView(View):
     def get(self, request):
-        reviews = Review.objects.filter(created_at__range=[
+        reviews = Review.objects.select_related('product').filter(created_at__range=[
             date.today() - timedelta(days=30), date.today() + timedelta(days=1)
             ]).annotate(review_like=Count('like')).order_by('-review_like')[:10]
         
@@ -199,6 +201,7 @@ class ReviewRankingCategoryView(View):
                     'product_id'        : product.id,
                     'product_name'      : product.name,
                     'product_thumbnail' : product.thumbnail,
+                    'product_price'     : product.price,
                 }for product in sub_category.product_set.all()]
             })
         
@@ -231,7 +234,7 @@ class ReviewLikeView(View):
 class ReviewListView(View):
     def get(self, request, product_id):
         try:            
-            reviews = Review.objects.filter(product_id=product_id)
+            reviews = Review.objects.select_related('user').filter(product_id=product_id)
             
             review_list = [{
                 'id': review.id,
