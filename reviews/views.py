@@ -96,7 +96,7 @@ class WriteReviewView(View):
                 'product_description'   : order_item.product.description,
                 'product_quantity'      : order_item.quantity,
                 'product_thumbnail'     : order_item.product.thumbnail,
-                'delivery_date'         : [delivery.delievery_date for delivery in order_item.delivery_set.all()],
+                'delivery_date'         : [delivery.delivery_date for delivery in order_item.delivery_set.all()],
                 'order_status'          : order_item.order.order_status.status,
                 'product_purchased_with':[{
                     'product_id'       : product_with.product.id,
