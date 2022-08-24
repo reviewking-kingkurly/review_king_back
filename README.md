@@ -1,24 +1,10 @@
-<h1 align="center">리뷰 맛집</h1>
+<h1 align="center">KURLY HACK FESTA 2022 - 리뷰 맛집</h1>
 <p align="center"><img src="https://user-images.githubusercontent.com/75832544/186341537-be7f66ae-113e-47cc-8006-8539e74a69d7.png"></p>
 
 
 
 
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li><a href="#project-structure">Project Structure</a></li>
-  </ol>
-</details>
+<br>
 
 
 
