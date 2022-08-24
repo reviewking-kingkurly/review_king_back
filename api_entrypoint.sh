@@ -11,10 +11,7 @@ echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
 echo "AWS_STORAGE_BUCKET_NAME=$AWS_STORAGE_BUCKET_NAME" >> .env
 echo "AWS_REGION=$AWS_REGION" >> .env
-echo "AWS_IMAGE_URL=$AWS_IMAGE_URL" >> .env
 
 cat .env
 
 gunicorn --bind 0.0.0.0:8000 review_king.wsgi:application
-
-# nginx -g 'daemon off;'

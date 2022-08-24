@@ -50,8 +50,11 @@ class LogInView(View, Validation):
                 return JsonResponse({"message" : "INVALID_PASSWORD"}, status=401)
 
             return JsonResponse({
-                "message"      : "SUCCESS",     
-                "access_token" : self.generate_jwt(user)
+                "message"     : "SUCCESS",
+                "access_token": self.generate_jwt(user),
+                "user_id"     : user.id,
+                "user_name"   : user.name,
+                "user_grade"  : user.grade
             }, status=200)
 
         except KeyError:
