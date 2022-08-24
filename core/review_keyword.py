@@ -8,7 +8,6 @@ from reviews.models  import Review
 from products.models import SubCategory
 
 def review_keyword(review_id):
-    # 다른 파일 리뷰, 상품명 불러오기
     review = Review.objects.get(id=review_id)
     review = review.content
     review = re.sub('[0-9]+', '', review)
@@ -23,7 +22,7 @@ def review_keyword(review_id):
         for match in match:
             if match[1] >= 100:
                 result.append(match[0])
-    my_set = set(result) #집합set으로 변환
-    result = list(my_set) #list로 변환
+    my_set = set(result)
+    result = list(my_set)
 
     return result
